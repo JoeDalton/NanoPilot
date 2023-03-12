@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/joe/snap/arduino/85/Arduino",
+                "/snap/arduino/"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "/home/joe/snap/arduino/85/Arduino/ArduinoOutput/compile_commands.json"
+        }
+    ],
+    "version": 4
+}
