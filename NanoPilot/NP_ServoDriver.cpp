@@ -28,10 +28,8 @@ NP_ServoDriver::NP_ServoDriver()
 {
   oscillatorFrequency = 27000000;
   servoFrequency      = 50;
-  //servo_min           = 150;
-  //servo_max           = 600;
-  servo_min           = 300;
-  servo_max           = 500;
+  servo_min           = 72;
+  servo_max           = 460;
   angle_min           = -90.0;
   angle_max           = 90.0;
 }
@@ -63,8 +61,8 @@ float NP_ServoDriver::get_angleCommand(uint8_t servoNum)
 
 void NP_ServoDriver::set_angleCommand(uint8_t servoNum, float angle)
 {
-  if (angle>180.0 ){angle=180.0; }
-  if (angle<0.0   ){angle=0.0;   }
+  if (angle>angle_max ){angle=angle_max; }
+  if (angle<angle_min ){angle=angle_min; }
   uint16_t  pulsew = map(angle, angle_min, angle_max, servo_min, servo_max);
   (*this).set_pwm(servoNum, pulsew);
 }

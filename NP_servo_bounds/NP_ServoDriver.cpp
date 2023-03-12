@@ -28,8 +28,8 @@ NP_ServoDriver::NP_ServoDriver()
 {
   oscillatorFrequency = 27000000;
   servoFrequency      = 50;
-  servo_min           = 100;
-  servo_max           = 500;
+  servo_min           = 72;
+  servo_max           = 460;
   angle_min           = -90.0;
   angle_max           = 90.0;
 }

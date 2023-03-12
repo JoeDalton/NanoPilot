@@ -80,7 +80,7 @@ void loop() {
   // ------------------ Move servos according to board orientation
   sd.set_angleCommand(0,roll);
   sd.set_angleCommand(1,pitch);
-  sd.set_angleCommand(2,yaw);
+  sd.set_angleCommand(2,yaw-90.0);
 
 
   // ------------------ Print Euler

@@ -2,7 +2,7 @@
 NP_ServoDriver sd;
 int SERVOMIN = 150;
 int SERVOMAX = 600;
-int servonum = 0;
+int servoNum = 0;
 
 String inString = "";  // string to hold input
 
@@ -46,7 +46,8 @@ void loop() {
       Serial.println(inString);
       uint16_t pulsew = inString.toInt();
       //sd.pwm.setPWM(servonum, 0, pulsew);
-      sd.set_pwm(0, pulsew);
+      sd.set_pwm(3, pulsew);
+      //sd.set_pwm(servoNum, pulsew);
       // clear the string for new input:
       inString = "";
     }
