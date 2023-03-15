@@ -57,9 +57,6 @@ void NP_IMU::init()
   #ifdef IMU_CONFIG_LSM9DS1
     if (IMU.begin()) {
       readiness = 1;
-      #ifdef VERBOSE
-        Serial.println("Initialized LSM9DS1")
-      #endif
     }
   #endif
   #ifdef IMU_CONFIG_MPU6050_HMC5883L
@@ -69,18 +66,14 @@ void NP_IMU::init()
       mpu.setGyroRange(MPU6050_RANGE_500_DEG);
       mpu.setFilterBandwidth(MPU6050_BAND_5_HZ);
       compass.init();
-       #ifdef VERBOSE
-      Serial.println("Initialized MPU6050 & HMC5883L")
-      #endif
     }
   #endif
-
 }
 
 //============================================================================================
 // Get readings from sensors
 
-void NP_IMU::get_raw()
+void NP_IMU::Read()
 {
 
   #ifdef IMU_CONFIG_LSM9DS1
@@ -113,6 +106,7 @@ void NP_IMU::get_raw()
     my = float(cy);
     mz = float(cz);
   #endif
+  (*this).correct();
 }
 
 //============================================================================================

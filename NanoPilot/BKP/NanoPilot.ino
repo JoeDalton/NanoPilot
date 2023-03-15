@@ -10,7 +10,7 @@
 SF fusion;
 NP_IMU imu;
 NP_ServoDriver sd;
-NP_RangeFinder rf;
+//NP_RangeFinder rf;
 
 
 float pitch, roll, yaw, alti;
@@ -52,7 +52,7 @@ void setup(void) {
   imu.init();
 
   //===================== Initialize range finder
-  rf.init();
+  //rf.init();
 
   //===================== Initialize fusion algorithm
   imu.Read();
