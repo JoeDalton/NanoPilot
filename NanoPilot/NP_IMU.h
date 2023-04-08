@@ -5,7 +5,7 @@
 // Generic wrapper for IMUs in NP
 //
 //  Date			  Author			Notes
-//  2023-03-06  G. Lavabre  Added suport for LSM9DS1
+//  2023-03-06  G. Lavabre  Added suport for LSM9DS1, MPU6050 and HMC5883L
 //
 //=============================================================================================
 #ifndef NP_IMU_h

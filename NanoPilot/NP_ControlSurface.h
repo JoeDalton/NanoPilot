@@ -1,47 +1,41 @@
 //=============================================================================================
-// NP_RangeFinder.h
+// NP_ControlSurface.cpp
 //=============================================================================================
 //
-// Generic wrapper for range finders in NP
+// Control surface class in NP
 //
-//  Date			  Author			Notes
-//  2023-03-14  G. Lavabre  Added suport for VL53LOX
+//  Date        Author      Notes
+//  2023-04-08  G. Lavabre  Minimal working code
 //
 //=============================================================================================
-#ifndef NP_RangeFinder_h
-#define NP_RangeFinder_h
 
+#ifndef NP_ControlSurface_h
+#define NP_ControlSurface_h
+
+#include "Hardware_Parameters.h"
+#include "NP_ServoDriver.h"
 #include <math.h>
 #include "Arduino.h"
-#include "Hardware_Parameters.h"
-#ifdef RF_CONFIG_VL53LOX
-  #include "Adafruit_VL53L0X.h"
-#endif
-
 
 //--------------------------------------------------------------------------------------------
 // Variable declaration
 
-class NP_RangeFinder {
+class NP_ControlSurface {
 //-------------------------------------------------------------------------------------------
 // Function declarations
 
 public:
+	NP_ControlSurface();
 
-	NP_RangeFinder();
-
-  void  init();
-  void  Read();
-  int   readiness;
-  float range;
-
+  void init(int csTypeInput, int csSideInput, int servoIndexInput, NP_ServoDriver servoDriverInput, float angleMinInput, float angleMaxInput);
+  void ComputeCommand();
+  void SetServo();
 
 
 private:
-  void correct();
-  #ifdef RF_CONFIG_VL53LOX
-    Adafruit_VL53L0X lox;
-  #endif
+  int   csType, csSide, servoIndex;
+  float angleMin, angleMax, angleCommand;
+  NP_ServoDriver servoDriver;
 };
 
 #endif

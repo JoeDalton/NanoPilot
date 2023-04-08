@@ -1,8 +1,6 @@
 #include "Streaming.h"    // needed for simpler Serial output https://github.com/geneReeves/ArduinoStreaming
-#include "NP_SensorFusion.h"
 
-//#include <Adafruit_Sensor.h>
-#include <Wire.h>
+#include "NP_SensorFusion.h"
 #include "NP_IMU.h"
 #include "NP_ServoDriver.h"
 #include "NP_RangeFinder.h"
@@ -25,12 +23,13 @@ float deltat;
 //#define VERBOSE
 
 
-
+// Note: Yaw angle seems to drift A LOT, even using Madgwick's compass fusion.
+// Also, there are spikes in the estimated range.
+// I suspect they are linked to the issue with lox.isRangeComplete(), which does not allow verifying that the range measurement is meaningful when reading.
 
 
 void setup(void) {
   Serial.begin(115200);
-  Wire.begin(); // Seems that this is not mandatory
   wait_for_serial();
   //===================== Initialize servo driver
   sd.init();
@@ -181,11 +180,11 @@ void AHRS_step() {
   oldAlti = alti;
 }
 
-float fast_cosinus(float angle) {
+/*float fast_cosinus(float angle) {
   float anglesq = angle*angle;
   float cosinus = 1 - anglesq * 0.5 + anglesq*anglesq * 0.0416666666667; // Series expansion of cosinus in 0. Maybe unnecessary ? Should test the time it takes to compute the real cosinus...
   return cosinus;
-}
+}*/
 
 void print_raw() {
   // Print out the values

@@ -42,7 +42,7 @@ void NP_ServoDriver::init()
   pwm.begin();
   pwm.setOscillatorFrequency(oscillatorFrequency);
   pwm.setPWMFreq(servoFrequency);
-  #ifndef VERBOSE
+  #ifdef VERBOSE
     Serial.println("Servo driver initialized");
   #endif
 }
