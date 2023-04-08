@@ -41,17 +41,12 @@ NP_RangeFinder::NP_RangeFinder()
 //-------------------------------------------------------------------------------------------
 void NP_RangeFinder::init()
 {
-  Serial.println("Initializing range finder");
   #ifdef RF_CONFIG_VL53LOX
-    Serial.println("Range finder type found");
-    Serial.println("lox defined");
     if (!lox.begin()) {
-      Serial.println("Failed to boot VL53L0X");
       readiness = -1;
     }
     else{
       lox.startRangeContinuous();
-      Serial.println("lox started");
     }
   #endif
 }
@@ -59,15 +54,12 @@ void NP_RangeFinder::init()
 //============================================================================================
 // Get readings from sensors
 
-float NP_RangeFinder::Read()
+void NP_RangeFinder::Read()
 {
 
   #ifdef RF_CONFIG_VL53LOX
-   // Serial.println("I read VL53L0X");
-    
-    /*Serial.println(lox.isRangeComplete());
-    if (!lox.isRangeComplete()) {
-      Serial.println("Range is not complete");
+    /*if (!lox.isRangeComplete()) {
+      //Serial.println("Range is not complete");
       return;
     }
     else {*/
@@ -78,11 +70,7 @@ float NP_RangeFinder::Read()
 
       // A problem remains: lox.isRangeComplete() is True only on the first try, then it's always false. However, "just" reading the range seems to work. Soooo... Good enough for now, I guess !
     //}
-    
-    
-    
   #endif
-  return range;
 }
 
 //============================================================================================

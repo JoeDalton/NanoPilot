@@ -1,28 +1,28 @@
 #include "Streaming.h"    // needed for simpler Serial output https://github.com/geneReeves/ArduinoStreaming
-//#include "NP_SensorFusion.h"
+#include "NP_SensorFusion.h"
 
 //#include <Adafruit_Sensor.h>
 #include <Wire.h>
-//#include "NP_IMU.h"
-//#include "NP_ServoDriver.h"
+#include "NP_IMU.h"
+#include "NP_ServoDriver.h"
 #include "NP_RangeFinder.h"
 
-//SF fusion;
-//NP_IMU imu;
-//NP_ServoDriver sd;
+SF fusion;
+NP_IMU imu;
+NP_ServoDriver sd;
 NP_RangeFinder rf;
 
 
-float pitch, roll, yaw, alti;
+float pitch, roll, yaw, alti, oldAlti;
 float radRoll, radPitch;
 float deltat;
 
 
-#define RAW_DATA
-#define EULER_DATA
+//#define RAW_DATA
+//#define EULER_DATA
 //#define PROCESSING
-//#define SERIAL_PLOTER
-#define VERBOSE
+#define SERIAL_PLOTER
+//#define VERBOSE
 
 
 
@@ -33,17 +33,17 @@ void setup(void) {
   Wire.begin(); // Seems that this is not mandatory
   wait_for_serial();
   //===================== Initialize servo driver
-  //sd.init();
-  //test_servos();
+  sd.init();
+  test_servos();
 
   //===================== Initialize IMU
-  //imu.init();
+  imu.init();
 
   //===================== Initialize range finder
   rf.init();
 
   //===================== Initialize fusion algorithm
-  /*
+  
   imu.Read();
   #ifdef VERBOSE
     if (fusion.initQuat(imu.ax,imu.ay,imu.az,imu.mx,imu.my,imu.mz)){
@@ -55,13 +55,13 @@ void setup(void) {
   #else
     fusion.initQuat(imu.ax,imu.ay,imu.az,imu.mx,imu.my,imu.mz);
   #endif
-  */
+  
 
 
   //===================== Misc.
-  /*
+  
   #ifdef SERIAL_PLOTER
-    Serial << "pitch" << " " << "roll" << " " << "yaw" << "altitude" << endl;
+    Serial << "pitch" << " " << "roll" << " " << "yaw" << " " << "altitude" << endl;
 
   #endif
   
@@ -79,40 +79,24 @@ void setup(void) {
     Serial.println("");
   }
   #endif
-  */
-
-
-
+  
   delay(1000);
 }
 
 
-void loop() {
+/*void loop() {
 
   alti = rf.Read();
   Serial.println(alti);
   delay(100);
 
-}
+}*/
 
-
-/*
 void loop() {
-  Serial.println("began loop");
+  //Serial.println("began loop");
   // ------------------ Read sensors
   imu.Read();
-  Serial.println("1");
-  if (lox.isRangeComplete()) {
-    Serial.print("Distance in mm: ");
-    Serial.println(lox.readRange());
-  }
-  else {
-    Serial.println("Range not complete");
-  }
-  
-  delay(1000);
-  //rf.Read();
-  Serial.println("2");
+  rf.Read();
   
   //DEBUG
   //imu.gx = 0; imu.gy = 0; imu.gz = 0;
@@ -123,16 +107,9 @@ void loop() {
   #ifdef RAW_DATA
     print_raw();
   #endif
-  Serial.println("3");
+  
   // ------------------ Update AHRS
   AHRS_step();
-  Serial.println("4");
-
-
-
-
-
-
 
   // ------------------ Move servos according to board orientation
   sd.set_angleCommand(0,roll);
@@ -154,7 +131,7 @@ void loop() {
   #endif
   // ------------------ Plot
   #ifdef SERIAL_PLOTER
-    Serial << pitch << " " << roll << " " << yaw << " " << alti << endl;
+    Serial << pitch << " " << roll << " " << yaw << " " << alti*100 << endl;
   #endif
 
   
@@ -162,12 +139,12 @@ void loop() {
 
   
   //delay(10);
-  //delay(1000); // For readability
+  //delay(500); // For readability
 }
-*/
 
 
-/*
+
+
 void test_servos() {
   sd.set_angleCommand(0,0.0);
   sd.set_angleCommand(1,0.0);
@@ -198,9 +175,10 @@ void AHRS_step() {
   radRoll   = fusion.getRollRadians();
   radPitch  = fusion.getPitchRadians();
 
-  // Approximate altitude
-  //alti = rf.distance * fast_cosinus(radRoll) * fast_cosinus(radPitch);
-  //alti = rf.distance * cos(radRoll) * cos(radPitch);
+  // Approximate altitude with attitude and low-pass filter
+  //alti = rf.range * fast_cosinus(radRoll) * fast_cosinus(radPitch);
+  alti = 0.6 * (rf.range * cos(radRoll) * cos(radPitch)) + 0.4 * oldAlti;
+  oldAlti = alti;
 }
 
 float fast_cosinus(float angle) {
@@ -236,7 +214,7 @@ void print_raw() {
   Serial.println(" muT");
   Serial.println("");
 }
-*/
+
 
 
 void wait_for_serial() {
