@@ -1,15 +1,15 @@
 #include "Streaming.h"    // needed for simpler Serial output https://github.com/geneReeves/ArduinoStreaming
-#include "NP_SensorFusion.h"
+//#include "NP_SensorFusion.h"
 
 //#include <Adafruit_Sensor.h>
 #include <Wire.h>
-#include "NP_IMU.h"
-#include "NP_ServoDriver.h"
+//#include "NP_IMU.h"
+//#include "NP_ServoDriver.h"
 #include "NP_RangeFinder.h"
 
-SF fusion;
-NP_IMU imu;
-NP_ServoDriver sd;
+//SF fusion;
+//NP_IMU imu;
+//NP_ServoDriver sd;
 NP_RangeFinder rf;
 
 
@@ -28,33 +28,22 @@ float deltat;
 
 
 
-
-
-#include "Adafruit_VL53L0X.h"
-
-Adafruit_VL53L0X lox = Adafruit_VL53L0X();
-
-
-
-
-
-
-
 void setup(void) {
   Serial.begin(115200);
-  Wire.begin();
+  Wire.begin(); // Seems that this is not mandatory
   wait_for_serial();
   //===================== Initialize servo driver
-  sd.init();
-  test_servos();
+  //sd.init();
+  //test_servos();
 
   //===================== Initialize IMU
-  imu.init();
+  //imu.init();
 
   //===================== Initialize range finder
   rf.init();
 
   //===================== Initialize fusion algorithm
+  /*
   imu.Read();
   #ifdef VERBOSE
     if (fusion.initQuat(imu.ax,imu.ay,imu.az,imu.mx,imu.my,imu.mz)){
@@ -66,10 +55,11 @@ void setup(void) {
   #else
     fusion.initQuat(imu.ax,imu.ay,imu.az,imu.mx,imu.my,imu.mz);
   #endif
-  
+  */
 
 
   //===================== Misc.
+  /*
   #ifdef SERIAL_PLOTER
     Serial << "pitch" << " " << "roll" << " " << "yaw" << "altitude" << endl;
 
@@ -89,39 +79,37 @@ void setup(void) {
     Serial.println("");
   }
   #endif
+  */
 
 
 
-
-  Serial.println("Adafruit VL53L0X test.");
-  if (!lox.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
-    while(1);
-  }
-  // power
-  Serial.println(F("VL53L0X API Continuous Ranging example\n\n"));
-
-  // start continuous ranging
-  lox.startRangeContinuous();
-
-
-  
   delay(1000);
 }
 
 
+void loop() {
+
+  alti = rf.Read();
+  Serial.println(alti);
+  delay(100);
+
+}
 
 
-
+/*
 void loop() {
   Serial.println("began loop");
   // ------------------ Read sensors
   imu.Read();
   Serial.println("1");
-    if (lox.isRangeComplete()) {
+  if (lox.isRangeComplete()) {
     Serial.print("Distance in mm: ");
     Serial.println(lox.readRange());
   }
+  else {
+    Serial.println("Range not complete");
+  }
+  
   delay(1000);
   //rf.Read();
   Serial.println("2");
@@ -176,7 +164,10 @@ void loop() {
   //delay(10);
   //delay(1000); // For readability
 }
+*/
 
+
+/*
 void test_servos() {
   sd.set_angleCommand(0,0.0);
   sd.set_angleCommand(1,0.0);
@@ -189,10 +180,10 @@ void test_servos() {
   sd.set_angleCommand(0,0.0);
   sd.set_angleCommand(1,0.0);
   sd.set_angleCommand(2,0.0);
-  /*delay(500);
+  delay(500);
   sd.set_angleCommand(0,-90.0);
   delay(500);
-  sd.set_angleCommand(0,0.0);*/
+  sd.set_angleCommand(0,0.0);
 }
 
 void AHRS_step() {
@@ -219,7 +210,7 @@ float fast_cosinus(float angle) {
 }
 
 void print_raw() {
-  /* Print out the values */
+  // Print out the values
   Serial.print("Acceleration   X: ");
   Serial.print(imu.ax);
   Serial.print(", Y: ");
@@ -245,6 +236,8 @@ void print_raw() {
   Serial.println(" muT");
   Serial.println("");
 }
+*/
+
 
 void wait_for_serial() {
   while (!Serial)

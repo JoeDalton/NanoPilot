@@ -18,7 +18,6 @@
 #include "Hardware_Parameters.h"
 #ifdef RF_CONFIG_VL53LOX
   #include "Adafruit_VL53L0X.h"
-  //Adafruit_VL53L0X lox1;
 #endif
 
 //-------------------------------------------------------------------------------------------
@@ -31,8 +30,11 @@
 
 NP_RangeFinder::NP_RangeFinder()
 {
-  distance = 0.0f;
+  range = 0.0f;
   readiness = 1;
+  #ifdef RF_CONFIG_VL53LOX
+    Adafruit_VL53L0X lox = Adafruit_VL53L0X();
+  #endif
 }
 
 
@@ -40,47 +42,54 @@ NP_RangeFinder::NP_RangeFinder()
 void NP_RangeFinder::init()
 {
   Serial.println("Initializing range finder");
-  //#ifdef RF_CONFIG_VL53LOX
+  #ifdef RF_CONFIG_VL53LOX
     Serial.println("Range finder type found");
-    //Adafruit_VL53L0X lox1 = Adafruit_VL53L0X();
-    lox1 = Adafruit_VL53L0X();
     Serial.println("lox defined");
-    if (!lox1.begin()) {
+    if (!lox.begin()) {
       Serial.println("Failed to boot VL53L0X");
       readiness = -1;
     }
-  //#endif
+    else{
+      lox.startRangeContinuous();
+      Serial.println("lox started");
+    }
+  #endif
 }
 
 //============================================================================================
 // Get readings from sensors
 
-void NP_RangeFinder::Read()
+float NP_RangeFinder::Read()
 {
 
-  //#ifdef RF_CONFIG_VL53LOX
-    Serial.println("I read VL53L0X");
-    Serial.println(lox1.readRange());
-    Serial.println(lox1.isRangeComplete());
-    if (!lox1.isRangeComplete()) {
+  #ifdef RF_CONFIG_VL53LOX
+   // Serial.println("I read VL53L0X");
+    
+    /*Serial.println(lox.isRangeComplete());
+    if (!lox.isRangeComplete()) {
       Serial.println("Range is not complete");
       return;
     }
-    Serial.println("VL53L0X range is complete");
-    //distance = lox.readRange();
-    Serial.println(lox1.readRange());
-    Serial.println("VL53L0X range is read");
-    (*this).correct();
-    Serial.println("VL53L0X range is corrected");
+    else {*/
+      //Serial.println("VL53L0X range is complete");
+      range = lox.readRange();
+      (*this).correct();
+      //Serial.println("VL53L0X range is read and corrected");
+
+      // A problem remains: lox.isRangeComplete() is True only on the first try, then it's always false. However, "just" reading the range seems to work. Soooo... Good enough for now, I guess !
+    //}
     
-  //#endif
+    
+    
+  #endif
+  return range;
 }
 
 //============================================================================================
 // Correct values with calibration
 void NP_RangeFinder::correct() {
-  distance -= rfBias;
-  distance *= rfScale;
+  range -= rfBias;
+  range *= rfScale;
 }
 
 

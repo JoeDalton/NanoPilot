@@ -31,18 +31,17 @@ public:
 	NP_RangeFinder();
 
   void init();
-  void Read();
-
-	
+  float Read();
   int   readiness;
-  float distance;
-  //#ifdef RF_CONFIG_VL53LOX
-    //Adafruit_VL53L0X lox1;
-	//#endif
+
 
 
 private:
   void correct();
+  float range;
+  #ifdef RF_CONFIG_VL53LOX
+    Adafruit_VL53L0X lox;
+  #endif
 };
 
 #endif
