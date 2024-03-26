@@ -12,7 +12,7 @@
 #define NP_IMU_h
 
 #include <math.h>
-#include "Arduino.h"
+#include <Arduino.h>
 #include "Hardware_Parameters.h"
 #ifdef IMU_CONFIG_LSM9DS1
   #include <Arduino_LSM9DS1.h>
