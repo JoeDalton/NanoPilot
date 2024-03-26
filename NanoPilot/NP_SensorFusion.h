@@ -33,11 +33,11 @@ public:
 	void MahonyUpdate(float gx, float gy, float gz, float ax, float ay, float az, float deltat);
 	
 	void MadgwickUpdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float deltat);
-    void MadgwickUpdate(float gx, float gy, float gz, float ax, float ay, float az, float deltat);
+  void MadgwickUpdate(float gx, float gy, float gz, float ax, float ay, float az, float deltat);
 	
-	// find initial Quaternios
+	// find initial Quaternions
 	// it is good practice to provide mean values from multiple measurements
-    bool initQuat(float ax, float ay, float az, float mx, float my, float mz);
+  bool initQuat(float ax, float ay, float az, float mx, float my, float mz);
 	//these values are already defined by arduino
 	//const float DEG_TO_RAD = 0.0174532925199433f; //PI/180.0f;	
 	//const float RAD_TO_DEG = 57.29577951308233f; //180.0f/PI
