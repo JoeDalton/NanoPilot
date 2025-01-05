@@ -1,3 +1,7 @@
+
+// Only for vscode to get Arduino.h instead of WProgram.h
+//#define ARDUINO 100
+
 #include "Streaming.h"    // needed for simpler Serial output https://github.com/geneReeves/ArduinoStreaming
 
 #include "NP_SensorFusion.h"
@@ -11,15 +15,16 @@ NP_ServoDriver sd;
 NP_RangeFinder rf;
 
 
+float q0, q1, q2, q3, quatArray[4];
 float pitch, roll, yaw, alti, oldAlti;
 float radRoll, radPitch;
 float deltat;
 
-
 //#define RAW_DATA
 //#define EULER_DATA
-//#define PROCESSING
-#define SERIAL_PLOTER
+#define QUAT_DATA
+// #define PROCESSING
+//#define SERIAL_PLOTTER
 //#define VERBOSE
 
 
@@ -29,20 +34,28 @@ float deltat;
 
 
 void setup(void) {
-  Serial.begin(115200);
-  wait_for_serial();
+  //===================== Initialize serial link
+  initialize_serial();
+  
   //===================== Initialize servo driver
   sd.init();
   test_servos();
+  
+  Serial.println("serovs ok");
 
   //===================== Initialize IMU
   imu.init();
+  
+  Serial.println("imu ok");
 
   //===================== Initialize range finder
   rf.init();
+  
+  Serial.println("range finder ok");
 
   //===================== Initialize fusion algorithm
   
+  Serial.println("fusion ok");
   imu.Read();
   #ifdef VERBOSE
     if (fusion.initQuat(imu.ax,imu.ay,imu.az,imu.mx,imu.my,imu.mz)){
@@ -65,34 +78,27 @@ void setup(void) {
   #endif
   
   #ifdef VERBOSE
-  if (imu.readiness < 0){
-    Serial.println("Setup failed");
-    Serial.println("");
-    Serial.println("--------------------");
-    Serial.println("");
-  }
-  else {
-    Serial.println("Setup is successful");
-    Serial.println("");
-    Serial.println("--------------------");
-    Serial.println("");
-  }
+    if (imu.readiness < 0){
+      Serial.println("Setup failed");
+      Serial.println("");
+      Serial.println("--------------------");
+      Serial.println("");
+    }
+    else {
+      Serial.println("Setup is successful");
+      Serial.println("");
+      Serial.println("--------------------");
+      Serial.println("");
+    }
   #endif
   
   delay(1000);
 }
 
-
-/*void loop() {
-
-  alti = rf.Read();
-  Serial.println(alti);
-  delay(100);
-
-}*/
-
 void loop() {
-  //Serial.println("began loop");
+  #ifdef VERBOSE
+    Serial.println("began loop");
+  #endif
   // ------------------ Read sensors
   imu.Read();
   rf.Read();
@@ -121,6 +127,10 @@ void loop() {
     Serial << "Pitch:\t" << pitch << "\t\tRoll:\t" << roll << "\t\tYaw:\t" << yaw << "\t\tAltitude:\t" << alti << endl << endl;
   #endif
 
+  #ifdef QUAT_DATA
+    Serial << q0 << " " << q1 << " " << q2 << " " << q3 << " " << alti << endl;
+  #endif
+
   // ------------------ Print Rad
   #ifdef PROCESSING
     roll = fusion.getRollRadians();
@@ -129,7 +139,7 @@ void loop() {
     Serial  << pitch << ":" << roll << ":" << yaw << endl;
   #endif
   // ------------------ Plot
-  #ifdef SERIAL_PLOTER
+  #ifdef SERIAL_PLOTTER
     Serial << pitch << " " << roll << " " << yaw << " " << alti*100 << endl;
   #endif
 
@@ -137,7 +147,7 @@ void loop() {
 
 
   
-  //delay(10);
+  delay(10);
   //delay(500); // For readability
 }
 
@@ -164,19 +174,26 @@ void test_servos() {
 
 void AHRS_step() {
   deltat = fusion.deltatUpdate();
-  //fusion.MahonyUpdate(imu.gx, imu.gy, imu.gz, imu.ax, imu.ay, imu.az, deltat);  //Mahony filter is suggested if no compass is available
-  fusion.MadgwickUpdate(imu.gx, imu.gy, imu.gz, imu.ax, imu.ay, imu.az, imu.mx, imu.my, imu.mz, deltat);  //else use Madgwick's filter
+  fusion.MahonyUpdate(imu.gx, imu.gy, imu.gz, imu.ax, imu.ay, imu.az, deltat);  //Mahony filter is suggested if no compass is available
+  // fusion.MadgwickUpdate(imu.gx, imu.gy, imu.gz, imu.ax, imu.ay, imu.az, imu.mx, imu.my, imu.mz, deltat);  //else use Madgwick's filter
 
   roll      = fusion.getRoll();
   pitch     = fusion.getPitch();
   yaw       = fusion.getYaw();
+
+  fusion.getQuatArray(quatArray);
+  q0 = quatArray[0];
+  q1 = quatArray[1];
+  q2 = quatArray[2];
+  q3 = quatArray[3];
 
   radRoll   = fusion.getRollRadians();
   radPitch  = fusion.getPitchRadians();
 
   // Approximate altitude with attitude and low-pass filter
   //alti = rf.range * fast_cosinus(radRoll) * fast_cosinus(radPitch);
-  alti = 0.6 * (rf.range * cos(radRoll) * cos(radPitch)) + 0.4 * oldAlti;
+  // alti = 0.6 * (rf.range * cos(radRoll) * cos(radPitch)) + 0.4 * oldAlti;
+  alti = 0.6 * rf.range + 0.4 * oldAlti;
   oldAlti = alti;
 }
 
@@ -215,6 +232,53 @@ void print_raw() {
 }
 
 
+void initialize_serial() {
+  bool is_serial_init = false;
+  #ifdef RAW_DATA
+    Serial.begin(115200);
+    wait_for_serial();
+    is_serial_init = true;
+  #endif
+  #ifdef EULER_DATA
+    if (!is_serial_init){
+      Serial.begin(115200);
+      wait_for_serial();
+      is_serial_init = true;
+    }
+  #endif
+  #ifdef QUAT_DATA
+    if (!is_serial_init){
+      Serial.begin(115200);
+      wait_for_serial();
+      is_serial_init = true;
+    }
+  #endif
+  #ifdef PROCESSING
+    if (!is_serial_init){
+      Serial.begin(115200);
+      wait_for_serial();
+      is_serial_init = true;
+    }
+  #endif
+  #ifdef SERIAL_PLOTTER
+    if (!is_serial_init){
+      Serial.begin(115200);
+      wait_for_serial();
+      is_serial_init = true;
+    }
+  #endif
+  #ifdef VERBOSE
+    if (!is_serial_init){
+      Serial.begin(115200);
+      wait_for_serial();
+      is_serial_init = true;
+    }
+  #endif
+  Serial.println("Serial link initialized");
+  #ifdef VERBOSE
+    Serial.println("is verbose");
+  #endif
+}
 
 void wait_for_serial() {
   while (!Serial)

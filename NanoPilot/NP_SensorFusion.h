@@ -74,8 +74,15 @@ public:
 		return yaw;
 	}
 	float* getQuat() {
+		// Not sure how this function works. Ignoring for now
 		memcpy(_copyQuat, &q0, sizeof(float)*4);
 		return _copyQuat;
+	}
+	void getQuatArray(float arr[4]) {
+		arr[0] = q0;
+		arr[1] = q1;
+		arr[2] = q2;
+		arr[3] = q3;
 	}
 
 private:
